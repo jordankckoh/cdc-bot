@@ -23,37 +23,38 @@ def convert_to_datetime(date_str: str, time_str: str = None):
 
 
 class handler(CDCAbstract):
+    
     def __init__(self, login_credentials, captcha_solver, log, notification_manager, browser_config, program_config):
-        browser_type = browser_config["type"] or "firefox"
-        headless = browser_config["headless_mode"] or False
+    browser_type = browser_config["type"] or "firefox"
+    headless = browser_config["headless_mode"] or False
 
         if browser_type.lower() != "firefox" and browser_type.lower() != "chrome":
             log.error("Invalid browser_type was given!")
             raise Exception("Invalid BROWSER_TYPE")
-
+    
         self.home_url = "https://www.cdc.com.sg"
         self.booking_url = "https://bookingportal.cdc.com.sg:"
         self.port = ""
-
+    
         self.captcha_solver = captcha_solver
         self.log = log
         self.notification_manager = notification_manager
-
+    
         self.browser_config = browser_config
         self.program_config = program_config
-
+    
         self.auto_reserve = program_config["auto_reserve"]
         self.auto_restart = program_config["auto_restart"]
         self.reserve_for_same_day = program_config["reserve_for_same_day"]
-
+    
         self.username = login_credentials["username"]
         self.password = login_credentials["password"]
         self.logged_in = False
         self.notification_update_msg = ""
         self.has_slots_reserved = False
-
+    
         self.platform = "linux" if "linux" in sys.platform else "windows" if "win32" in sys.platform else "osx"
-
+    
         self.opening_booking_page_callback_map = {
             Types.BTT: self.open_theory_test_booking_page,
             Types.RTT: self.open_theory_test_booking_page,
@@ -62,23 +63,29 @@ class handler(CDCAbstract):
             Types.SIMULATOR: self.open_simulator_lessons_booking_page,
             Types.PT: self.open_practical_test_booking_page,
         }
-
-        options = browser_type.lower() == "firefox" and webdriver.FirefoxOptions() or webdriver.ChromeOptions()
+    
+        # Set up browser options
+        options = webdriver.FirefoxOptions() if browser_type.lower() == "firefox" else webdriver.ChromeOptions()
         if headless:
             options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--no-proxy-server")
-
+    
+        # Set up driver service
         driver_name = "geckodriver" if browser_type.lower() == "firefox" else "chromedriver"
         if self.platform == "windows":
             driver_name += ".exe"
         executable_path = os.path.join("drivers", self.platform, driver_name)
-
+    
         if browser_type.lower() == "firefox":
-            self.driver = webdriver.Firefox(executable_path=executable_path, options=options)
+            from selenium.webdriver.firefox.service import Service
+            service = Service(executable_path=executable_path)
+            self.driver = webdriver.Firefox(service=service, options=options)
         else:
-            self.driver = webdriver.Chrome(executable_path=executable_path, options=options)
-
+            from selenium.webdriver.chrome.service import Service
+            service = Service(executable_path=executable_path)
+            self.driver = webdriver.Chrome(service=service, options=options)
+    
         self.driver.set_window_size(1600, 768)
         super().__init__(username=self.username, password=self.password, headless=headless)
 
