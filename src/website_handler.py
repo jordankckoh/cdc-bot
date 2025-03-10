@@ -250,7 +250,14 @@ class handler(CDCAbstract):
 
     def account_login(self):
         self.open_home_page(sleep_delay=2)
-        print("Opened homepage")
+        self.log.info("Waiting for page to load")
+        WebDriverWait(self.driver, 15).until(lambda d: d.execute_script("return document.readyState") == "complete")
+        self.log.info("Homepage fully loaded")
+    
+        self.log.info("Looking for login button at XPath: //*[@id='top-menu']/ul/li[10]/a")
+        prompt_login_btn = selenium_common.wait_for_elem(self.driver, By.XPATH, "//*[@id='top-menu']/ul/li[10]/a", timeout=15)
+        self.log.info("Found login button")
+        prompt_login_btn.click()
 
         prompt_login_btn = selenium_common.wait_for_elem(self.driver, By.XPATH, "//*[@id='top-menu']/ul/li[10]/a", timeout=15)
         print("Found login button")
