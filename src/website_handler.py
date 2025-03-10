@@ -250,19 +250,26 @@ class handler(CDCAbstract):
 
     def account_login(self):
         self.open_home_page(sleep_delay=2)
+        print("Opened homepage")
 
-        prompt_login_btn = selenium_common.wait_for_elem(self.driver, By.XPATH, "//*[@id='top-menu']/ul/li[10]/a")
+        prompt_login_btn = selenium_common.wait_for_elem(self.driver, By.XPATH, "//*[@id='top-menu']/ul/li[10]/a", timeout=15)
+        print("Found login button")
         prompt_login_btn.click()
 
-        learner_id_input = selenium_common.wait_for_elem(self.driver, By.NAME, "userId")
-        password_input = selenium_common.wait_for_elem(self.driver, By.NAME, "password")
+        learner_id_input = selenium_common.wait_for_elem(self.driver, By.NAME, "userId", timeout=15)
+        print("Found username field")
+        password_input = selenium_common.wait_for_elem(self.driver, By.NAME, "password", timeout=15)
+        print("Found password field")
 
         learner_id_input.send_keys(self.username)
         password_input.send_keys(self.password)
 
         success, _ = self.captcha_solver.solve(driver=self.driver, captcha_type="recaptcha_v2")
+        print("Captcha solved:", success)
+        
         if success:
-            login_btn = selenium_common.wait_for_elem(self.driver, By.ID, "BTNSERVICE2")
+            login_btn = selenium_common.wait_for_elem(self.driver, By.ID, "BTNSERVICE2", timeout=15)
+            print("Found login submit button")
             login_btn.click()
 
             _, alert_text = selenium_common.dismiss_alert(driver=self.driver, timeout=5)
