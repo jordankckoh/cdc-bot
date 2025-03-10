@@ -25,8 +25,8 @@ def convert_to_datetime(date_str: str, time_str: str = None):
 class handler(CDCAbstract):
     
     def __init__(self, login_credentials, captcha_solver, log, notification_manager, browser_config, program_config):
-    browser_type = browser_config["type"] or "firefox"
-    headless = browser_config["headless_mode"] or False
+        browser_type = browser_config["type"] or "firefox"
+        headless = browser_config["headless_mode"] or False
 
         if browser_type.lower() != "firefox" and browser_type.lower() != "chrome":
             log.error("Invalid browser_type was given!")
