@@ -32,7 +32,7 @@ class handler(CDCAbstract):
             log.error("Invalid browser_type was given!")
             raise Exception("Invalid BROWSER_TYPE")
     
-        self.home_url = "https://www.cdc.com.sg"
+        self.home_url = "https://www.cdc.com.sg/#login"
         self.booking_url = "https://bookingportal.cdc.com.sg:"
         self.port = ""
     
